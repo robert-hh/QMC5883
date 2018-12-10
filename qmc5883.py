@@ -21,7 +21,7 @@ import struct
 class QMC5883:
     # probe the existence of const()
     try:
-        _canary = const(0)
+        _canary = const(0xfeed)
     except:
         const = lambda x:x
 
