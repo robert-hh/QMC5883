@@ -18,12 +18,13 @@
 import time
 import struct
 
+
 class QMC5883:
     # probe the existence of const()
     try:
         _canary = const(0xfeed)
     except:
-        const = lambda x:x
+        const = lambda x: x
 
     # Default I2C address
     ADDR = const(0x0D)
@@ -91,9 +92,11 @@ class QMC5883:
 
     def reconfig(self):
         self.i2c.writeto_mem(QMC5883.ADDR, QMC5883.CONFIG,
-                             self.oversampling | self.range | self.rate | self.mode)
+                             self.oversampling | self.range |
+                             self.rate | self.mode)
         time.sleep(0.01)
-        self.i2c.writeto_mem(QMC5883.ADDR, QMC5883.CONFIG2, QMC5883.CONFIG2_INT_DISABLE)
+        self.i2c.writeto_mem(QMC5883.ADDR, QMC5883.CONFIG2,
+                             QMC5883.CONFIG2_INT_DISABLE)
         time.sleep(0.01)
 
     def set_oversampling(self, sampling):
@@ -134,7 +137,8 @@ class QMC5883:
         try:
             while not self.ready():
                 time.sleep(0.005)
-            self.i2c.readfrom_mem_into(QMC5883.ADDR, QMC5883.X_LSB, self.register)
+            self.i2c.readfrom_mem_into(QMC5883.ADDR, QMC5883.X_LSB,
+                                       self.register)
         except OSError as error:
             print("OSError", error)
             pass  # just silently re-use the old values
