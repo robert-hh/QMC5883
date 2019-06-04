@@ -83,20 +83,24 @@ class QMC5883:
         self.rate = QMC5883.CONFIG_100HZ
         self.mode = QMC5883.CONFIG_CONT
         self.register = bytearray(9)
+        self.command = bytearray(1)
         self.reset()
 
     def reset(self):
-        self.i2c.writeto_mem(QMC5883.ADDR, QMC5883.RESET, 0x01)
+        self.command[0] = 1
+        self.i2c.writeto_mem(QMC5883.ADDR, QMC5883.RESET, self.command)
         time.sleep(0.1)
         self.reconfig()
 
     def reconfig(self):
+        self.command[0] = (self.oversampling | self.range |
+                           self.rate | self.mode)
         self.i2c.writeto_mem(QMC5883.ADDR, QMC5883.CONFIG,
-                             self.oversampling | self.range |
-                             self.rate | self.mode)
+                             self.command)
         time.sleep(0.01)
+        self.command[0] = QMC5883.CONFIG2_INT_DISABLE
         self.i2c.writeto_mem(QMC5883.ADDR, QMC5883.CONFIG2,
-                             QMC5883.CONFIG2_INT_DISABLE)
+                             self.command)
         time.sleep(0.01)
 
     def set_oversampling(self, sampling):
