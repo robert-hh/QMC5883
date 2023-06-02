@@ -19,7 +19,7 @@ import time
 import struct
 
 
-class QMC5883:
+class QMC5883L:
     # probe the existence of const()
     try:
         _canary = const(0xfeed)
@@ -78,70 +78,70 @@ class QMC5883:
     def __init__(self, i2c, offset=50.0):
         self.i2c = i2c
         self.temp_offset = offset
-        self.oversampling = QMC5883.CONFIG_OS64
-        self.range = QMC5883.CONFIG_2GAUSS
-        self.rate = QMC5883.CONFIG_100HZ
-        self.mode = QMC5883.CONFIG_CONT
+        self.oversampling = QMC5883L.CONFIG_OS64
+        self.range = QMC5883L.CONFIG_2GAUSS
+        self.rate = QMC5883L.CONFIG_100HZ
+        self.mode = QMC5883L.CONFIG_CONT
         self.register = bytearray(9)
         self.command = bytearray(1)
         self.reset()
 
     def reset(self):
         self.command[0] = 1
-        self.i2c.writeto_mem(QMC5883.ADDR, QMC5883.RESET, self.command)
+        self.i2c.writeto_mem(QMC5883L.ADDR, QMC5883L.RESET, self.command)
         time.sleep(0.1)
         self.reconfig()
 
     def reconfig(self):
         self.command[0] = (self.oversampling | self.range |
                            self.rate | self.mode)
-        self.i2c.writeto_mem(QMC5883.ADDR, QMC5883.CONFIG,
+        self.i2c.writeto_mem(QMC5883L.ADDR, QMC5883L.CONFIG,
                              self.command)
         time.sleep(0.01)
-        self.command[0] = QMC5883.CONFIG2_INT_DISABLE
-        self.i2c.writeto_mem(QMC5883.ADDR, QMC5883.CONFIG2,
+        self.command[0] = QMC5883L.CONFIG2_INT_DISABLE
+        self.i2c.writeto_mem(QMC5883L.ADDR, QMC5883L.CONFIG2,
                              self.command)
         time.sleep(0.01)
 
     def set_oversampling(self, sampling):
-        if (sampling << 6) in (QMC5883.CONFIG_OS512, QMC5883.CONFIG_OS256,
-                               QMC5883.CONFIG_OS128, QMC5883.CONFIG_OS64):
+        if (sampling << 6) in (QMC5883L.CONFIG_OS512, QMC5883L.CONFIG_OS256,
+                               QMC5883L.CONFIG_OS128, QMC5883L.CONFIG_OS64):
             self.oversampling = sampling << 6
             self.reconfig()
         else:
             raise ValueError("Invalid parameter")
 
     def set_range(self, rng):
-        if (rng << 4) in (QMC5883.CONFIG_2GAUSS, QMC5883.CONFIG_8GAUSS):
+        if (rng << 4) in (QMC5883L.CONFIG_2GAUSS, QMC5883L.CONFIG_8GAUSS):
             self.range = rng << 4
             self.reconfig()
         else:
             raise ValueError("Invalid parameter")
 
     def set_sampling_rate(self, rate):
-        if (rate << 2) in (QMC5883.CONFIG_10HZ, QMC5883.CONFIG_50HZ,
-                           QMC5883.CONFIG_100HZ, QMC5883.CONFIG_200HZ):
+        if (rate << 2) in (QMC5883L.CONFIG_10HZ, QMC5883L.CONFIG_50HZ,
+                           QMC5883L.CONFIG_100HZ, QMC5883L.CONFIG_200HZ):
             self.rate = rate << 2
             self.reconfig()
         else:
             raise ValueError("Invalid parameter")
 
     def ready(self):
-        status = self.i2c.readfrom_mem(QMC5883.ADDR, QMC5883.STATUS, 1)[0]
+        status = self.i2c.readfrom_mem(QMC5883L.ADDR, QMC5883L.STATUS, 1)[0]
         # prevent hanging up here.
         # Happens when reading less bytes then then all 3 axis and will
         # end up in a loop. So, return any data but avoid the loop.
-        if status == QMC5883.STATUS_DOR:
+        if status == QMC5883L.STATUS_DOR:
             print("Incomplete read")
-            return QMC5883.STATUS_DRDY
+            return QMC5883L.STATUS_DRDY
 
-        return status & QMC5883.STATUS_DRDY
+        return status & QMC5883L.STATUS_DRDY
 
     def read_raw(self):
         try:
             while not self.ready():
                 time.sleep(0.005)
-            self.i2c.readfrom_mem_into(QMC5883.ADDR, QMC5883.X_LSB,
+            self.i2c.readfrom_mem_into(QMC5883L.ADDR, QMC5883L.X_LSB,
                                        self.register)
         except OSError as error:
             print("OSError", error)
@@ -153,7 +153,7 @@ class QMC5883:
 
     def read_scaled(self):
         x, y, z, temp = self.read_raw()
-        scale = 12000 if self.range == QMC5883.CONFIG_2GAUSS else 3000
+        scale = 12000 if self.range == QMC5883L.CONFIG_2GAUSS else 3000
 
         return (x / scale, y / scale, z / scale,
                 (temp / 100 + self.temp_offset))

@@ -1,9 +1,11 @@
-# QMC5883: Python class for the QMC5883 Three-Axis Digital Compass IC
+# QMC5883L: Python class for the QMC5883L Three-Axis Digital Compass IC
 
 This is a very short and simple class. It uses the I2C bus for the interface.
 
 Initial code by Sebastian Folz, M.Sc. at
 http://nobytes.blogspot.com/2018/03/qmc5883-magnetic-field-sensor.html
+
+Library is not support **QMC5883P**, you may use other lib (for example: https://github.com/ChangboBro/QMC5883-3-Axis-magnetic-Sensor-micropython) 
 
 ## Constructor
 
