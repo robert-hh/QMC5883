@@ -1,18 +1,16 @@
-# QMC5883L: Python class for the QMC5883L Three-Axis Digital Compass IC
+# QMC5883L/QMC5883P: Python class for the QMC5883L/QMC5883P Three-Axis Digital Compass IC
 
 This is a very short and simple class. It uses the I2C bus for the interface.
 
 Initial code by Sebastian Folz, M.Sc. at
 http://nobytes.blogspot.com/2018/03/qmc5883-magnetic-field-sensor.html
 
-Library is not support **QMC5883P**, you may use other lib (for example: https://github.com/ChangboBro/QMC5883-3-Axis-magnetic-Sensor-micropython) 
-
 ## Constructor
 
-### QMC5883 = QMC5883(i2c [, temp_offset])
+### QMC5883 = QMC5883P(i2c [, temp_offset])
 
 - i2c is an I2C object which has to be created by the caller.
-- temp_offset specifies the offset to the temperature, as returned by the method
+- temp_offset specifies the offset to the temperature, as returned by the method (only in QMC5883L)
 read_scaled. The unit is °C, the default is 50 °C.
 
 ## Methods
@@ -67,10 +65,10 @@ required when settings are changed.
 # P10  |  SCL
 #
 from machine import I2C
-from QMC5883 import QMC5883
+from QMC5883 import QMC5883L
 
 i2c = I2C(0, I2C.MASTER)
-qmc5883 = QMC5883(i2c)
+qmc5883 = QMC5883L(i2c)
 
 x, y, z, temp = qmc5883.read_scaled()
 ```

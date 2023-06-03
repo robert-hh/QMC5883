@@ -17,9 +17,9 @@
 
 import time
 import struct
+from mag_base import mag_base
 
-
-class QMC5883L:
+class QMC5883L(mag_base):
     # probe the existence of const()
     try:
         _canary = const(0xfeed)
@@ -76,7 +76,8 @@ class QMC5883L:
     CONFIG2_SOFT_RST = const(0b10000000)
 
     def __init__(self, i2c, offset=50.0):
-        self.i2c = i2c
+        super().__init__(self, i2c)
+
         self.temp_offset = offset
         self.oversampling = QMC5883L.CONFIG_OS64
         self.range = QMC5883L.CONFIG_2GAUSS
