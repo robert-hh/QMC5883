@@ -42,10 +42,10 @@ class QMC5883P(mag_base):
         self.reset()
 
         self.i2c_writereg(0x29, b'\x06')  # define the sign for syz axis
-        self.range = QMC5883P.CONFIG_2GAUSS
-        self.i2c_writereg(0x0B, self.range << 2)
+        self.set_range(0)
         self.i2c_writereg(0x0A, QMC5883P.CR1_DOWN_SMPL8 | QMC5883P.CR1_OVR_SMPL8 | QMC5883P.CR1_ODR_200HZ | QMC5883P.CR1_MODE_NORMAL)
         self.ready()
+        self.set_range(0)
 
 
     def i2c_readregs(self, regAddr, bytenum):  # int,int,int
@@ -89,6 +89,7 @@ class QMC5883P(mag_base):
     
     def reset(self):
         self.i2c_writereg(0x0B, QMC5883P.CR2_SOFT_RESET)
+        time.sleep_ms(1)
 
 
     def ready(self):
