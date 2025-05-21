@@ -76,7 +76,7 @@ class QMC5883L(mag_base):
     CONFIG2_SOFT_RST = const(0b10000000)
 
     def __init__(self, i2c, offset=50.0):
-        super().__init__(self, i2c)
+        super().__init__(i2c)
 
         self.temp_offset = offset
         self.oversampling = QMC5883L.CONFIG_OS64
